@@ -17,7 +17,7 @@ from malt_mcp_server.core.exceptions import (
 )
 from malt_mcp_server.scraping.profile import scrape_profile
 
-_USERNAME_RE = re.compile(r"^[a-zA-Z0-9_-]{1,100}$")
+_USERNAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,98}[a-z0-9]$")
 
 
 def _get_browser(ctx: Context) -> BrowserManager:

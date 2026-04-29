@@ -1,5 +1,3 @@
-"""Auto-install Patchright Chrome browser on first run."""
-
 import logging
 import subprocess
 import sys

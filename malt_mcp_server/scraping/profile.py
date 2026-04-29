@@ -45,17 +45,14 @@ async def scrape_profile(page: Page) -> dict[str, Any]:
     try:
         await page.wait_for_function(
             "() => !document.title.includes('instant')",
-            timeout=30_000,
+            timeout=0,
         )
-        await page.wait_for_selector(_SEL_NAME, state="visible", timeout=15_000)
-    except PlaywrightError:
-        current_url = page.url
+        await page.wait_for_selector(_SEL_NAME, state="visible", timeout=0)
+    except PlaywrightError as e:
         title = await page.title()
-        logger.warning(
-            "Profile not loaded. URL: %s | Title: %s",
-            current_url,
-            title,
-        )
+        raise MaltScrapingError(
+            f"Profile page did not render. URL: {page.url} | Title: {title}"
+        ) from e
 
     data: dict[str, Any] = {}
 
@@ -102,11 +99,10 @@ async def scrape_profile(page: Page) -> dict[str, Any]:
     if languages:
         data["languages"] = languages
 
-    if len(data) <= 1:
+    if "name" not in data:
         title = await page.title()
         raise MaltScrapingError(
-            f"No profile data found. URL: {page.url} | Title: {title} | "
-            f"Keys found: {list(data.keys())}"
+            f"No profile name found. URL: {page.url} | Title: {title}"
         )
 
     return data
