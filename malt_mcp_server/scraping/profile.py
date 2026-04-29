@@ -45,9 +45,9 @@ async def scrape_profile(page: Page) -> dict[str, Any]:
     try:
         await page.wait_for_function(
             "() => !document.title.includes('instant')",
-            timeout=0,
+            timeout=30_000,
         )
-        await page.wait_for_selector(_SEL_NAME, state="visible", timeout=0)
+        await page.wait_for_selector(_SEL_NAME, state="visible", timeout=15_000)
     except PlaywrightError as e:
         title = await page.title()
         raise MaltScrapingError(

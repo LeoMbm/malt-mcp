@@ -5,6 +5,7 @@ from fastmcp.server.lifespan import lifespan
 
 from malt_mcp_server.core.browser import BrowserManager
 from malt_mcp_server.tools.profile import register_profile_tools
+from malt_mcp_server.tools.stats import register_stats_tools
 
 
 @dataclass
@@ -42,3 +43,4 @@ mcp = FastMCP(
 )
 
 register_profile_tools(mcp)
+register_stats_tools(mcp)

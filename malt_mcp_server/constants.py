@@ -8,7 +8,8 @@ PRIVATE_DIR_MODE = 0o700
 # Malt URLs
 MALT_BASE_URL = "https://www.malt.fr"
 MALT_LOGIN_URL = f"{MALT_BASE_URL}/login"
-MALT_DASHBOARD_URL = f"{MALT_BASE_URL}/dashboard"
+MALT_DASHBOARD_URL = f"{MALT_BASE_URL}/dashboard/freelancer"
+MALT_ANALYTICS_URL = f"{MALT_DASHBOARD_URL}/analytics"
 MALT_PROFILE_URL = f"{MALT_BASE_URL}/profile"
 MALT_MESSAGES_URL = f"{MALT_BASE_URL}/project/messages"
 
