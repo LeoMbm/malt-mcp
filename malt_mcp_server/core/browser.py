@@ -19,13 +19,13 @@ from patchright.async_api import (
 )
 from patchright.async_api import Error as PlaywrightError
 
+from malt_mcp_server.bootstrap import configure_browser_environment
 from malt_mcp_server.constants import (
     BROWSER_DIR,
     DEFAULT_TIMEOUT_MS,
     DEFAULT_USER_DATA_DIR,
     PRIVATE_DIR_MODE,
 )
-from malt_mcp_server.bootstrap import configure_browser_environment
 from malt_mcp_server.core.exceptions import MaltNetworkError
 
 logger = logging.getLogger(__name__)

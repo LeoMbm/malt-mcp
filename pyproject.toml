@@ -1,6 +1,6 @@
 [project]
 name = "malt-mcp"
-version = "0.4.0"
+version = "0.4.1"
 description = "MCP server for Malt.fr — manage your freelance profile, stats, missions, and availability through AI assistants."
 readme = "README.md"
 requires-python = ">=3.12,<3.15"

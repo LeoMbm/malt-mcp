@@ -6,7 +6,6 @@ from typing import Any
 from fastmcp import Context, FastMCP
 from fastmcp.exceptions import ToolError
 from mcp.types import ToolAnnotations
-
 from patchright.async_api import Error as PlaywrightError
 
 from malt_mcp_server.constants import MALT_PROFILE_URL, TOOL_TIMEOUT_SECONDS
