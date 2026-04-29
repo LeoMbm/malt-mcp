@@ -131,7 +131,6 @@ async def _parse_offer(el: Locator) -> dict[str, Any] | None:
         return None
 
 
-
 _MAX_SCROLLS = 20
 
 

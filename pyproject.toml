@@ -81,5 +81,5 @@ ignore = []
 asyncio_mode = "auto"
 testpaths = ["tests"]
 
-[tool.ty]
+[tool.ty.environment]
 python-version = "3.12"
