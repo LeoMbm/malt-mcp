@@ -13,7 +13,7 @@ MALT_PROFILE_URL = f"{MALT_BASE_URL}/profile"
 MALT_MESSAGES_URL = f"{MALT_BASE_URL}/project/messages"
 
 # Browser defaults
-DEFAULT_TIMEOUT_MS = 5000
+DEFAULT_TIMEOUT_MS = 30_000
 TOOL_TIMEOUT_SECONDS = 60
 
 # Viewport

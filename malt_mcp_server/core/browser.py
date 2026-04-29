@@ -12,6 +12,7 @@ from patchright.async_api import (
     Playwright,
     async_playwright,
 )
+from patchright.async_api import Error as PlaywrightError
 
 from malt_mcp_server.constants import (
     BROWSER_DIR,
@@ -25,15 +26,23 @@ logger = logging.getLogger(__name__)
 
 
 def _harden_directory(path: Path) -> None:
-    """Ensure directories from path up to .malt-mcp are owner-only (0o700)."""
+    """Ensure directories from path up to .malt-mcp are owner-only (0o700).
+
+    Stops at the .malt-mcp anchor directory. Does nothing if the path
+    is not inside a .malt-mcp tree.
+    """
     if os.name == "nt":
         return
     d = path if path.is_dir() else path.parent
+    if not any(p.name == ".malt-mcp" for p in (d, *d.parents)):
+        return
     for p in (d, *d.parents):
+        if p.name == ".malt-mcp":
+            if p.is_dir() and stat.S_IMODE(p.stat().st_mode) != PRIVATE_DIR_MODE:
+                p.chmod(PRIVATE_DIR_MODE)
+            return
         if p.is_dir() and stat.S_IMODE(p.stat().st_mode) != PRIVATE_DIR_MODE:
             p.chmod(PRIVATE_DIR_MODE)
-        if p.name == ".malt-mcp":
-            return
 
 
 def _secure_mkdir(path: Path) -> None:
@@ -112,7 +121,7 @@ class BrowserManager:
         """Navigate to URL and wait for load."""
         try:
             await self.page.goto(url, wait_until="domcontentloaded")
-        except Exception as e:
+        except PlaywrightError as e:
             raise MaltNetworkError(f"Failed to navigate to {url}: {e}") from e
         return self.page
 
