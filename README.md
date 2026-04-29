@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/python-3.12+-3776ab?logo=python&logoColor=white)](https://python.org)
 [![License](https://img.shields.io/badge/License-Apache%202.0-%233fb950?labelColor=32383f)](LICENSE)
 
-Give Claude and any MCP-compatible AI assistant access to your [Malt.fr](https://www.malt.fr) freelance account — profile, stats, and missions.
+MCP server for [Malt.fr](https://www.malt.fr). Lets Claude (or any MCP client) read your freelance profile, stats, and missions.
 
 ## Tools
 
@@ -15,13 +15,26 @@ Give Claude and any MCP-compatible AI assistant access to your [Malt.fr](https:/
 | `get_missions` | List mission conversations from messaging | working |
 | `get_mission_details` | Get full details of a specific mission (budget, skills, messages) | working |
 
-## 📦 Installation
+## 📦 Claude Desktop MCP Bundle
 
-### uvx (recommended)
+**Prerequisites:** [Claude Desktop](https://claude.ai/download).
+
+**One-click installation:**
+
+1. Download the latest `.mcpb` from [releases](https://github.com/LeoMbm/malt-mcp-server/releases/latest)
+2. Double-click the `.mcpb` file to install it into Claude Desktop
+3. Call any Malt tool
+
+First time, a browser window pops up so you can log into Malt. Session is saved in `~/.malt-mcp/` and reused across restarts.
+
+> [!NOTE]
+> Google OAuth doesn't work (blocked by Google when automated). Use email/password.
+
+## 🚀 uvx Setup (Universal)
 
 **Prerequisites:** [uv](https://docs.astral.sh/uv/getting-started/installation/) installed.
 
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+Add to your MCP client config (Claude Desktop, Claude Code, or any MCP-compatible client):
 
 ```json
 {
@@ -35,20 +48,15 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 }
 ```
 
-### First-time login
+`@latest` pulls the newest version from PyPI on each launch. First auth-requiring call opens a browser for login.
+
+To log in ahead of time:
 
 ```bash
 uvx malt-mcp@latest --login
 ```
 
-This opens a browser window where you log into Malt manually. Your session is saved locally in `~/.malt-mcp/profile/` and persists across restarts.
-
-> [!NOTE]
-> Only email/password login is supported. Google OAuth is detected and blocked by Google when automated.
-
 ### Docker (coming soon)
-
-### MCP Bundle for Claude Desktop (coming soon)
 
 ## ⚙️ CLI Options
 
@@ -64,30 +72,29 @@ This opens a browser window where you log into Malt manually. Your session is sa
 
 **Login issues:**
 
-- Only email/password login works. Google OAuth will fail.
-- If your session expires, re-run `uvx malt-mcp@latest --login`.
-- Malt may show a Cloudflare challenge on first load — the browser handles it automatically, but it may take a few seconds.
+- Google OAuth won't work. Use email/password.
+- Session expired? Re-run `uvx malt-mcp@latest --login`.
+- Cloudflare challenge on first load is normal — the browser handles it, give it a few seconds.
 
 **Timeout issues:**
 
-- If pages fail to load or elements aren't found, increase the timeout: `--timeout 10000`
-- Slow connections may need higher values (e.g., `15000`)
+- Pages not loading? Try `--timeout 10000`. Slow connections might need `15000`.
 
 **Browser issues:**
 
-- This server requires a **headed** (visible) browser. Headless mode is blocked by Cloudflare.
-- On first run, Patchright downloads a Chromium browser (~200 MB). This is automatic.
+- Headless mode doesn't work — Cloudflare blocks it. The browser window is expected.
+- First run downloads Chromium (~200 MB via Patchright). One-time thing.
 
-## 🔒 Privacy & Security
+## 🔒 How it works
 
-This server uses browser automation ([Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright)) to interact with Malt.fr through a real browser session. No unofficial APIs are used.
+Under the hood, this is browser automation via [Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright) (Playwright fork). No API, no reverse-engineering — it drives a real browser like you would.
 
-- **Your credentials stay local.** Login happens in your browser; cookies are stored in `~/.malt-mcp/profile/`.
-- **Read-only.** All current tools only read data — nothing is modified on your Malt account.
-- **No data leaves your machine.** The MCP server runs locally and communicates only with Malt.fr.
+- **Credentials stay local.** Cookies live in `~/.malt-mcp/profile/`, nowhere else.
+- **Read-only.** Nothing is modified on your Malt account (for now).
+- **Runs locally.** The server talks to Malt.fr and nothing else.
 
 > [!IMPORTANT]
-> Malt's Terms of Service may prohibit automated tools. With normal usage (not bulk scraping) you should be fine. Use responsibly.
+> Malt's TOS may prohibit automated tools. Don't bulk-scrape. Use responsibly.
 
 ## 🐍 Development
 
