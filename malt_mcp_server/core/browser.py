@@ -120,7 +120,7 @@ class BrowserManager:
     async def navigate(self, url: str) -> Page:
         """Navigate to URL and wait for load."""
         try:
-            await self.page.goto(url, wait_until="domcontentloaded")
+            await self.page.goto(url, wait_until="commit")
         except PlaywrightError as e:
             raise MaltNetworkError(f"Failed to navigate to {url}: {e}") from e
         return self.page

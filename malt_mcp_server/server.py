@@ -9,7 +9,7 @@ from malt_mcp_server.tools.profile import register_profile_tools
 
 @dataclass
 class _BrowserConfig:
-    headless: bool = True
+    headless: bool = False
     timeout: int = 30_000
 
 
@@ -18,7 +18,7 @@ _config = _BrowserConfig()
 
 def configure_browser(
     *,
-    headless: bool = True,
+    headless: bool = False,
     timeout: int = 30_000,
 ) -> None:
     _config.headless = headless

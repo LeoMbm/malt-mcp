@@ -38,6 +38,25 @@ _SEL_LANGUAGES_LEVEL = "[data-testid^='profile-language-level-']"
 
 async def scrape_profile(page: Page) -> dict[str, Any]:
     """Extract profile data from the current Malt profile page."""
+    logger.info("Scraping URL: %s", page.url)
+
+    # Malt shows a loading page ("Un instant…") before rendering.
+    # Wait for it to pass, then wait for the profile to render.
+    try:
+        await page.wait_for_function(
+            "() => !document.title.includes('instant')",
+            timeout=30_000,
+        )
+        await page.wait_for_selector(_SEL_NAME, state="visible", timeout=15_000)
+    except PlaywrightError:
+        current_url = page.url
+        title = await page.title()
+        logger.warning(
+            "Profile not loaded. URL: %s | Title: %s",
+            current_url,
+            title,
+        )
+
     data: dict[str, Any] = {}
 
     data["url"] = page.url
@@ -84,7 +103,11 @@ async def scrape_profile(page: Page) -> dict[str, Any]:
         data["languages"] = languages
 
     if len(data) <= 1:
-        raise MaltScrapingError("No profile data found. Selectors may be outdated.")
+        title = await page.title()
+        raise MaltScrapingError(
+            f"No profile data found. URL: {page.url} | Title: {title} | "
+            f"Keys found: {list(data.keys())}"
+        )
 
     return data
 

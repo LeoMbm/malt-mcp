@@ -27,9 +27,9 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Clear stored browser profile",
     )
     parser.add_argument(
-        "--no-headless",
+        "--headless",
         action="store_true",
-        help="Show browser window (debug)",
+        help="Run browser without window (may fail on Cloudflare)",
     )
     parser.add_argument(
         "--log-level",
@@ -96,7 +96,7 @@ def main() -> None:
         return
 
     configure_browser(
-        headless=not args.no_headless,
+        headless=args.headless,
         timeout=args.timeout,
     )
     mcp.run(transport="stdio")
