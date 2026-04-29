@@ -56,6 +56,7 @@ packages = ["malt_mcp_server"]
 
 [dependency-groups]
 dev = [
+    "mcp[cli]>=1.27.0",
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
     "pytest-asyncio>=1.0.0",
