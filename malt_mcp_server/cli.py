@@ -1,7 +1,92 @@
-import sys
+import argparse
+import asyncio
+import logging
+import shutil
+
+from malt_mcp_server.constants import DEFAULT_TIMEOUT_MS, DEFAULT_USER_DATA_DIR
+from malt_mcp_server.core.auth import wait_for_login
+from malt_mcp_server.core.browser import BrowserManager
+from malt_mcp_server.server import configure_browser, mcp
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="malt-mcp",
+        description="MCP server for Malt.fr",
+    )
+    parser.add_argument(
+        "--login",
+        action="store_true",
+        help="Open browser to log in and save session",
+    )
+    parser.add_argument(
+        "--logout",
+        action="store_true",
+        help="Clear stored browser profile",
+    )
+    parser.add_argument(
+        "--no-headless",
+        action="store_true",
+        help="Show browser window (debug)",
+    )
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        default="WARNING",
+        help="Set log level (default: WARNING)",
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=DEFAULT_TIMEOUT_MS,
+        help=f"Browser timeout in ms (default: {DEFAULT_TIMEOUT_MS})",
+    )
+    return parser
+
+
+async def _login(*, timeout: int) -> None:
+    async with BrowserManager(headless=False, timeout=timeout) as browser:
+        await wait_for_login(browser.page)
+
+
+def _logout() -> None:
+    path = DEFAULT_USER_DATA_DIR
+    lock = path / "SingletonLock"
+    if lock.exists():
+        print("Browser profile in use. Stop the MCP server first.")  # noqa: T201
+        return
+    if path.exists():
+        shutil.rmtree(path)
+        print(f"Removed browser profile: {path}")  # noqa: T201
+    else:
+        print("No browser profile found")  # noqa: T201
 
 
 def main() -> None:
-    """Entry point for the malt-mcp CLI."""
-    print("malt-mcp: CLI not yet implemented", file=sys.stderr)  # noqa: T201
-    sys.exit(1)
+    parser = _build_parser()
+    args = parser.parse_args()
+
+    log_levels = {
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARNING": logging.WARNING,
+        "ERROR": logging.ERROR,
+    }
+    logging.basicConfig(
+        level=log_levels[args.log_level],
+        format="%(asctime)s %(name)s %(levelname)s %(message)s",
+    )
+
+    if args.logout:
+        _logout()
+        return
+
+    if args.login:
+        asyncio.run(_login(timeout=args.timeout))
+        return
+
+    configure_browser(
+        headless=not args.no_headless,
+        timeout=args.timeout,
+    )
+    mcp.run(transport="stdio")
