@@ -11,19 +11,29 @@ from malt_mcp_server.core.exceptions import MaltScrapingError
 
 logger = logging.getLogger(__name__)
 
-# CSS selectors for profile fields.
-# Each selector tries data-testid first, then common class fallbacks.
-# Adjust these when Malt changes their HTML.
-_SEL_HEADLINE = "[data-testid='profile-headline'], .profile-headline, h1"
-_SEL_RATE = "[data-testid='profile-rate'], .profile-rate, .daily-rate"
-_SEL_RATING = "[data-testid='profile-rating'], .profile-rating, .rating-value"
-_SEL_MISSIONS = "[data-testid='missions-count'], .missions-count"
-_SEL_SKILLS = "[data-testid='skill-tag'], .skill-tag, .profile-skill"
-_SEL_BIO = "[data-testid='profile-bio'], .profile-bio, .profile-description"
-_SEL_AVAILABILITY = (
-    "[data-testid='availability-status'], .availability-badge, .availability-status"
+# CSS selectors for profile fields (verified on live Malt HTML 2026-04-29).
+# Malt uses data-testid attributes extensively. Adjust when HTML changes.
+_SEL_NAME = "[data-testid='profile-fullname']"
+_SEL_HEADLINE = "[data-testid='profile-headline']"
+_SEL_RATE = "[data-testid='profile-price']"
+_SEL_PROJECTS = ".project-indicator__text"
+_SEL_LOCATION = (
+    "[data-testid='profile-location-preference-address'] .location-indicator__text"
 )
-_SEL_EXPERIENCE = "[data-testid='experience-years'], .experience-years"
+_SEL_EXPERIENCE = (
+    "[data-testid='profile-header-experience-level'] .experience-level-indicator__text"
+)
+_SEL_TOP_SKILLS = (
+    "[data-testid^='profile-main-skill-set-top-skills-']"
+    " .profile-edition__skills_item__tag__content"
+)
+_SEL_ALL_SKILLS = (
+    "[data-testid^='profile-main-skill-set-selected-skills-']"
+    " .profile-edition__skills_item__tag__content"
+)
+_SEL_BIO = "[data-testid='profile-description-content']"
+_SEL_LANGUAGES_NAME = "[data-testid^='profile-language-name-']"
+_SEL_LANGUAGES_LEVEL = "[data-testid^='profile-language-level-']"
 
 
 async def scrape_profile(page: Page) -> dict[str, Any]:
@@ -31,6 +41,10 @@ async def scrape_profile(page: Page) -> dict[str, Any]:
     data: dict[str, Any] = {}
 
     data["url"] = page.url
+
+    name = await _text(page, _SEL_NAME)
+    if name:
+        data["name"] = name
 
     headline = await _text(page, _SEL_HEADLINE)
     if headline:
@@ -41,34 +55,53 @@ async def scrape_profile(page: Page) -> dict[str, Any]:
         data["daily_rate"] = _parse_rate(daily_rate)
         data["daily_rate_raw"] = daily_rate
 
-    rating = await _text(page, _SEL_RATING)
-    if rating:
-        data["rating"] = _parse_float(rating)
+    projects = await _text(page, _SEL_PROJECTS)
+    if projects:
+        data["projects_count"] = _parse_int(projects)
 
-    missions = await _text(page, _SEL_MISSIONS)
-    if missions:
-        data["missions_count"] = _parse_int(missions)
+    location = await _text(page, _SEL_LOCATION)
+    if location:
+        data["location"] = location
 
-    skills = await _all_texts(page, _SEL_SKILLS)
-    if skills:
-        data["skills"] = skills
+    experience = await _text(page, _SEL_EXPERIENCE)
+    if experience:
+        data["experience"] = experience
+
+    top_skills = await _all_texts(page, _SEL_TOP_SKILLS)
+    if top_skills:
+        data["top_skills"] = top_skills
+
+    all_skills = await _all_texts(page, _SEL_ALL_SKILLS)
+    if all_skills:
+        data["skills"] = all_skills
 
     bio = await _text(page, _SEL_BIO)
     if bio:
         data["bio"] = bio
 
-    availability = await _text(page, _SEL_AVAILABILITY)
-    if availability:
-        data["availability"] = availability
-
-    experience_years = await _text(page, _SEL_EXPERIENCE)
-    if experience_years:
-        data["experience_years"] = _parse_int(experience_years)
+    languages = await _scrape_languages(page)
+    if languages:
+        data["languages"] = languages
 
     if len(data) <= 1:
         raise MaltScrapingError("No profile data found. Selectors may be outdated.")
 
     return data
+
+
+async def _scrape_languages(page: Page) -> list[dict[str, str]]:
+    names = await _all_texts(page, _SEL_LANGUAGES_NAME)
+    levels = await _all_texts(page, _SEL_LANGUAGES_LEVEL)
+    if len(names) != len(levels):
+        logger.warning(
+            "Language name/level count mismatch: %d names, %d levels",
+            len(names),
+            len(levels),
+        )
+    return [
+        {"name": name, "level": level}
+        for name, level in zip(names, levels, strict=False)
+    ]
 
 
 async def _text(page: Page, selector: str) -> str | None:
@@ -108,13 +141,6 @@ def _parse_rate(raw: str) -> int | None:
             return round(float(num_str))
         except ValueError:
             return None
-    return None
-
-
-def _parse_float(raw: str) -> float | None:
-    match = re.search(r"(\d+[.,]?\d*)", raw)
-    if match:
-        return float(match.group(1).replace(",", "."))
     return None
 
 

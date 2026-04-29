@@ -4,6 +4,7 @@ from fastmcp import FastMCP
 from fastmcp.server.lifespan import lifespan
 
 from malt_mcp_server.core.browser import BrowserManager
+from malt_mcp_server.tools.profile import register_profile_tools
 
 
 @dataclass
@@ -39,3 +40,5 @@ mcp = FastMCP(
     lifespan=browser_lifespan,
     instructions="MCP server for managing your Malt.fr freelance account.",
 )
+
+register_profile_tools(mcp)
