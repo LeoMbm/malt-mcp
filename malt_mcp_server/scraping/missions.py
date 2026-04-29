@@ -41,6 +41,15 @@ async def scrape_missions(page: Page) -> list[dict[str, Any]]:
             f"Messages page did not render. URL: {page.url} | Title: {title}"
         ) from e
 
+    # Scroll the conversation list to load all lazy-loaded items.
+    scrollable = (
+        page.locator(_SEL_LIST)
+        .locator("xpath=ancestor::*[contains(@class,'scrollable')]")
+        .first
+    )
+    all_items_sel = f"{_SEL_CONVERSATION}, {_SEL_PROJECT_OFFER}"
+    await _scroll_to_load_all(scrollable, all_items_sel, page)
+
     missions: list[dict[str, Any]] = []
 
     conversations = page.locator(_SEL_CONVERSATION)
@@ -134,3 +143,26 @@ async def _safe_count(locator: Locator) -> int:
         return await locator.count()
     except PlaywrightError:
         return 0
+
+
+_MAX_SCROLLS = 20
+
+
+async def _scroll_to_load_all(
+    scrollable: Locator,
+    items_selector: str,
+    page: Page,
+) -> None:
+    """Scroll the conversation list container to load all items."""
+    prev_count = 0
+    for _ in range(_MAX_SCROLLS):
+        current_count = await _safe_count(page.locator(items_selector))
+        if current_count == prev_count and prev_count > 0:
+            break
+        prev_count = current_count
+        try:
+            await scrollable.evaluate("el => el.scrollTop = el.scrollHeight")
+        except PlaywrightError:
+            break
+        await page.wait_for_timeout(1000)
+    logger.info("Loaded %d items after scrolling", prev_count)
