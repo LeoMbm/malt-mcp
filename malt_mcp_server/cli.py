@@ -87,6 +87,10 @@ def main() -> None:
         _logout()
         return
 
+    from malt_mcp_server.bootstrap import ensure_browser
+
+    ensure_browser()
+
     if args.login:
         asyncio.run(_login(timeout=args.timeout))
         return
