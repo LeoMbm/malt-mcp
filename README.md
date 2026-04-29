@@ -6,6 +6,10 @@
 
 MCP server for [Malt.fr](https://www.malt.fr). Lets Claude (or any MCP client) read your freelance profile, stats, and missions.
 
+[![Install MCP Bundle](https://img.shields.io/badge/Claude_Desktop_MCPB-d97757?style=for-the-badge&logo=anthropic&logoColor=white)](#-claude-desktop-mcp-bundle)
+[![uvx](https://img.shields.io/badge/uvx-Quick_Install-de5fe9?style=for-the-badge&logo=uv&logoColor=white)](#-uvx-setup-universal)
+[![Docker](https://img.shields.io/badge/Docker-Coming_Soon-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#docker-coming-soon)
+
 ## Tools
 
 | Tool | Description | Status |
