@@ -38,6 +38,9 @@ htmlcov/
 # Malt MCP local data
 .malt-mcp/
 
+# Claude Code local config
+.claude/
+
 # Debug scripts
 _debug_*
 
