@@ -1,3 +1,4 @@
+<!-- mcp-name: io.github.LeoMbm/malt-mcp -->
 # Malt MCP Server
 
 [![PyPI](https://img.shields.io/pypi/v/malt-mcp?color=blue)](https://pypi.org/project/malt-mcp/)
