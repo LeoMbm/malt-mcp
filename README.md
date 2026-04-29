@@ -10,6 +10,10 @@ MCP server for [Malt.fr](https://www.malt.fr). Lets Claude (or any MCP client) r
 [![uvx](https://img.shields.io/badge/uvx-Quick_Install-de5fe9?style=for-the-badge&logo=uv&logoColor=white)](#-uvx-setup-universal)
 [![Docker](https://img.shields.io/badge/Docker-Coming_Soon-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#docker-coming-soon)
 
+<p align="center">
+  <img src="assets/malt-demo.gif" alt="Malt MCP Server demo" width="800">
+</p>
+
 ## Tools
 
 | Tool | Description | Status |
