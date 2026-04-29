@@ -50,23 +50,20 @@ async def scrape_missions(page: Page) -> list[dict[str, Any]]:
     all_items_sel = f"{_SEL_CONVERSATION}, {_SEL_PROJECT_OFFER}"
     await _scroll_to_load_all(scrollable, all_items_sel, page)
 
+    # Parse all items in DOM order to preserve Malt's chronological sort.
+    all_items = page.locator(all_items_sel)
+    count = await _safe_count(all_items)
     missions: list[dict[str, Any]] = []
 
-    conversations = page.locator(_SEL_CONVERSATION)
-    conv_count = await _safe_count(conversations)
-    for i in range(conv_count):
-        item = await _parse_conversation(conversations.nth(i))
+    for i in range(count):
+        el = all_items.nth(i)
+        cls = await el.get_attribute("class") or ""
+        if "conversation-summary__wrapper" in cls:
+            item = await _parse_conversation(el)
+        else:
+            item = await _parse_offer(el)
         if item:
             missions.append(item)
-
-    offers = page.locator(_SEL_PROJECT_OFFER)
-    offer_count = await _safe_count(offers)
-    for i in range(offer_count):
-        item = await _parse_offer(offers.nth(i))
-        if item:
-            missions.append(item)
-
-    missions.sort(key=lambda m: m.get("date", ""), reverse=True)
 
     if not missions:
         raise MaltScrapingError("No missions found in inbox.")
