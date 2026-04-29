@@ -38,5 +38,8 @@ htmlcov/
 # Malt MCP local data
 .malt-mcp/
 
+# Debug scripts
+_debug_*
+
 # Code review graph
 .code-review-graph/
