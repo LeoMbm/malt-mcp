@@ -1,10 +1,16 @@
 ## What's new
 
-First public release of Malt MCP Server.
+- `authenticate` - log in to Malt directly from Claude Desktop
+- `close_session` - close the browser when you're done
+- Browser auto-recovers if closed or crashed (lazy singleton pattern)
+- MCP Bundle (`.mcpb`) included for one-click Claude Desktop install
 
-- `get_profile` - read your freelance profile (bio, rate, skills, rating)
-- `get_statistics` - view profile stats (views, response rate)
-- `get_missions` - list mission conversations from inbox
+### All tools
+
+- `authenticate` / `close_session` - session management
+- `get_profile` - freelance profile (bio, rate, skills, rating)
+- `get_statistics` - profile stats (views, response rate)
+- `get_missions` - mission conversations from inbox
 - `get_mission_details` - full mission details (budget, skills, messages)
 
 ## Install
