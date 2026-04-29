@@ -18,10 +18,12 @@ MCP server for [Malt.fr](https://www.malt.fr). Lets Claude (or any MCP client) r
 
 | Tool | Description | Status |
 |------|-------------|--------|
+| `authenticate` | Log in to Malt interactively from Claude Desktop | working |
 | `get_profile` | Get freelance profile info (bio, daily rate, skills, rating) | working |
 | `get_statistics` | View profile stats (views, response rate, missions) | working |
 | `get_missions` | List mission conversations from messaging | working |
 | `get_mission_details` | Get full details of a specific mission (budget, skills, messages) | working |
+| `close_session` | Close the browser and free resources | working |
 
 ## 📦 Claude Desktop MCP Bundle
 
@@ -31,9 +33,10 @@ MCP server for [Malt.fr](https://www.malt.fr). Lets Claude (or any MCP client) r
 
 1. Download the latest `.mcpb` from [releases](https://github.com/LeoMbm/malt-mcp/releases/latest)
 2. Double-click the `.mcpb` file to install it into Claude Desktop
-3. Call any Malt tool
+3. Ask Claude "connecte-moi a Malt" - a browser opens, you log in, done
+4. Call any Malt tool
 
-First time, a browser window pops up so you can log into Malt. Session is saved in `~/.malt-mcp/` and reused across restarts.
+No terminal needed. Session is saved in `~/.malt-mcp/` and reused across restarts.
 
 > [!NOTE]
 > Google OAuth doesn't work (blocked by Google when automated). Use email/password.
