@@ -1,3 +1,4 @@
+from collections.abc import AsyncIterator
 from dataclasses import dataclass
 
 from fastmcp import FastMCP
@@ -29,7 +30,7 @@ def configure_browser(
 
 
 @lifespan
-async def browser_lifespan(server: FastMCP) -> dict[str, BrowserManager]:  # noqa: ARG001
+async def browser_lifespan(server: FastMCP) -> AsyncIterator[dict[str, BrowserManager]]:  # noqa: ARG001
     browser = BrowserManager(headless=_config.headless, timeout=_config.timeout)
     await browser.start()
     try:
