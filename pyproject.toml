@@ -72,7 +72,7 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "S", "ANN"]
-ignore = ["ANN101", "ANN102"]
+ignore = []
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101"]
