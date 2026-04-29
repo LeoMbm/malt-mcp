@@ -73,10 +73,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.check-version-bump.outputs.new-version }}
         run: |
-          gh release create "v${VERSION}" \
-            --title "v${VERSION}" \
-            --generate-notes \
-            dist/* *.mcpb
+          if [ -f RELEASE_NOTES_TEMPLATE.md ]; then
+            gh release create "v${VERSION}" \
+              --title "v${VERSION}" \
+              --notes-file RELEASE_NOTES_TEMPLATE.md \
+              dist/* *.mcpb
+          else
+            gh release create "v${VERSION}" \
+              --title "v${VERSION}" \
+              --generate-notes \
+              dist/* *.mcpb
+          fi
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
