@@ -8,20 +8,11 @@ from mcp.types import ToolAnnotations
 
 from malt_mcp_server.constants import MALT_MESSAGES_URL, TOOL_TIMEOUT_SECONDS
 from malt_mcp_server.core.auth import require_auth
-from malt_mcp_server.core.browser import BrowserManager
-from malt_mcp_server.core.exceptions import (
-    MaltAuthError,
-    MaltNetworkError,
-    MaltScrapingError,
-)
+from malt_mcp_server.core.exceptions import MaltAuthError, MaltScrapingError
 from malt_mcp_server.scraping.mission_details import (
     click_conversation,
     scrape_mission_details,
 )
-
-
-def _get_browser(ctx: Context) -> BrowserManager:
-    return ctx.lifespan_context["browser"]
 
 
 def register_mission_details_tools(mcp: FastMCP) -> None:
@@ -44,31 +35,29 @@ def register_mission_details_tools(mcp: FastMCP) -> None:
             name: Client name or keyword to find in the conversation list.
                   Matches against conversation titles (case-insensitive).
         """
-        browser = _get_browser(ctx)
-
         try:
-            await require_auth(browser.page)
+            page = await require_auth()
         except MaltAuthError as e:
             raise ToolError(str(e)) from e
 
         await ctx.info(f"Loading messages: {MALT_MESSAGES_URL}")
 
         try:
-            await browser.navigate(MALT_MESSAGES_URL)
-        except MaltNetworkError as e:
+            await page.goto(MALT_MESSAGES_URL, wait_until="commit")
+        except Exception as e:
             raise ToolError(f"Could not load messages: {e}") from e
 
         await ctx.info(f"Looking for conversation: {name}")
 
         try:
-            await click_conversation(browser.page, name)
+            await click_conversation(page, name)
         except MaltScrapingError as e:
             raise ToolError(str(e)) from e
 
         await ctx.info("Extracting mission details")
 
         try:
-            details = await scrape_mission_details(browser.page)
+            details = await scrape_mission_details(page)
         except MaltScrapingError as e:
             raise ToolError(f"Failed to parse mission details: {e}") from e
 

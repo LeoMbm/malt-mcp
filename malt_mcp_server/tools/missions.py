@@ -8,17 +8,8 @@ from mcp.types import ToolAnnotations
 
 from malt_mcp_server.constants import MALT_MESSAGES_URL, TOOL_TIMEOUT_SECONDS
 from malt_mcp_server.core.auth import require_auth
-from malt_mcp_server.core.browser import BrowserManager
-from malt_mcp_server.core.exceptions import (
-    MaltAuthError,
-    MaltNetworkError,
-    MaltScrapingError,
-)
+from malt_mcp_server.core.exceptions import MaltAuthError, MaltScrapingError
 from malt_mcp_server.scraping.missions import scrape_missions
-
-
-def _get_browser(ctx: Context) -> BrowserManager:
-    return ctx.lifespan_context["browser"]
 
 
 def register_missions_tools(mcp: FastMCP) -> None:
@@ -35,22 +26,20 @@ def register_missions_tools(mcp: FastMCP) -> None:
         Returns a list of conversations and project offers sorted by date,
         with client name, company, last message, and status.
         """
-        browser = _get_browser(ctx)
-
         try:
-            await require_auth(browser.page)
+            page = await require_auth()
         except MaltAuthError as e:
             raise ToolError(str(e)) from e
 
         await ctx.info(f"Fetching messages: {MALT_MESSAGES_URL}")
 
         try:
-            await browser.navigate(MALT_MESSAGES_URL)
-        except MaltNetworkError as e:
+            await page.goto(MALT_MESSAGES_URL, wait_until="commit")
+        except Exception as e:
             raise ToolError(f"Could not load messages: {e}") from e
 
         try:
-            missions = await scrape_missions(browser.page)
+            missions = await scrape_missions(page)
         except MaltScrapingError as e:
             raise ToolError(f"Failed to parse messages: {e}") from e
 

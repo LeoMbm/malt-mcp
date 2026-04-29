@@ -8,17 +8,8 @@ from mcp.types import ToolAnnotations
 
 from malt_mcp_server.constants import MALT_ANALYTICS_URL, TOOL_TIMEOUT_SECONDS
 from malt_mcp_server.core.auth import require_auth
-from malt_mcp_server.core.browser import BrowserManager
-from malt_mcp_server.core.exceptions import (
-    MaltAuthError,
-    MaltNetworkError,
-    MaltScrapingError,
-)
+from malt_mcp_server.core.exceptions import MaltAuthError, MaltScrapingError
 from malt_mcp_server.scraping.stats import scrape_statistics
-
-
-def _get_browser(ctx: Context) -> BrowserManager:
-    return ctx.lifespan_context["browser"]
 
 
 def register_stats_tools(mcp: FastMCP) -> None:
@@ -36,22 +27,20 @@ def register_stats_tools(mcp: FastMCP) -> None:
         search appearances, profile views), project reviews/rating,
         and keyword rankings.
         """
-        browser = _get_browser(ctx)
-
         try:
-            await require_auth(browser.page)
+            page = await require_auth()
         except MaltAuthError as e:
             raise ToolError(str(e)) from e
 
         await ctx.info(f"Fetching analytics: {MALT_ANALYTICS_URL}")
 
         try:
-            await browser.navigate(MALT_ANALYTICS_URL)
-        except MaltNetworkError as e:
+            await page.goto(MALT_ANALYTICS_URL, wait_until="commit")
+        except Exception as e:
             raise ToolError(f"Could not load analytics: {e}") from e
 
         try:
-            stats = await scrape_statistics(browser.page)
+            stats = await scrape_statistics(page)
         except MaltScrapingError as e:
             raise ToolError(f"Failed to parse analytics: {e}") from e
 

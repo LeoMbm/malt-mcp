@@ -25,7 +25,7 @@ MCP server for [Malt.fr](https://www.malt.fr). Lets Claude (or any MCP client) r
 
 **One-click installation:**
 
-1. Download the latest `.mcpb` from [releases](https://github.com/LeoMbm/malt-mcp-server/releases/latest)
+1. Download the latest `.mcpb` from [releases](https://github.com/LeoMbm/malt-mcp/releases/latest)
 2. Double-click the `.mcpb` file to install it into Claude Desktop
 3. Call any Malt tool
 
@@ -78,7 +78,7 @@ uvx malt-mcp@latest --login
 
 - Google OAuth won't work. Use email/password.
 - Session expired? Re-run `uvx malt-mcp@latest --login`.
-- Cloudflare challenge on first load is normal — the browser handles it, give it a few seconds.
+- Cloudflare challenge on first load is normal - the browser handles it, give it a few seconds.
 
 **Timeout issues:**
 
@@ -86,12 +86,12 @@ uvx malt-mcp@latest --login
 
 **Browser issues:**
 
-- Headless mode doesn't work — Cloudflare blocks it. The browser window is expected.
+- Headless mode doesn't work - Cloudflare blocks it. The browser window is expected.
 - First run downloads Chromium (~200 MB via Patchright). One-time thing.
 
 ## 🔒 How it works
 
-Under the hood, this is browser automation via [Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright) (Playwright fork). No API, no reverse-engineering — it drives a real browser like you would.
+Under the hood, this is browser automation via [Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright) (Playwright fork). No API, no reverse-engineering - it drives a real browser like you would.
 
 - **Credentials stay local.** Cookies live in `~/.malt-mcp/profile/`, nowhere else.
 - **Read-only.** Nothing is modified on your Malt account (for now).
@@ -105,8 +105,8 @@ Under the hood, this is browser automation via [Patchright](https://github.com/K
 Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for architecture guidelines.
 
 ```bash
-git clone https://github.com/LeoMbm/malt-mcp-server.git
-cd malt-mcp-server
+git clone https://github.com/LeoMbm/malt-mcp.git
+cd malt-mcp
 uv sync --group dev
 pre-commit install
 ```

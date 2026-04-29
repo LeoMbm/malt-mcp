@@ -2,7 +2,7 @@
 
 Thanks for your interest in contributing to Malt MCP Server!
 
-Please [open an issue](https://github.com/LeoMbm/malt-mcp-server/issues) first to discuss any feature or bug fix before submitting a PR.
+Please [open an issue](https://github.com/LeoMbm/malt-mcp/issues) first to discuss any feature or bug fix before submitting a PR.
 
 ## Architecture
 
@@ -13,7 +13,7 @@ malt_mcp_server/
 ├── constants.py           # All Malt URLs and timeouts
 ├── bootstrap.py           # First-run Patchright browser install
 ├── core/
-│   ├── browser.py         # BrowserManager — Patchright lifecycle
+│   ├── browser.py         # BrowserManager - Patchright lifecycle
 │   ├── auth.py            # Login flow + require_auth() guard
 │   └── exceptions.py      # Domain exceptions (MaltAuthError, etc.)
 ├── scraping/              # All DOM interaction lives here
@@ -32,17 +32,17 @@ malt_mcp_server/
 ### Key rules
 
 - **`tools/` are thin wrappers.** They check auth, navigate, and delegate to `scraping/`. No CSS selectors or DOM access in `tools/`.
-- **`scraping/` owns all DOM interaction.** Selectors, XPath, page.evaluate — everything DOM-related stays here.
+- **`scraping/` owns all DOM interaction.** Selectors, XPath, page.evaluate - everything DOM-related stays here.
 - **`constants.py` holds all URLs.** Never hardcode Malt URLs elsewhere.
 - **One browser tab at a time.** Tool calls are serialized, never concurrent.
 - **Headed mode only.** Cloudflare blocks headless browsers. Don't try to work around it.
 
 ## Adding a new tool
 
-1. **Create `scraping/<name>.py`** — scraping logic, returns a dict or list
-2. **Create `tools/<name>.py`** — MCP tool wrapper with `register_<name>_tools(mcp)` function
-3. **Register in `server.py`** — import and call `register_<name>_tools(mcp)`
-4. **Add to README** — update the tools table
+1. **Create `scraping/<name>.py`** - scraping logic, returns a dict or list
+2. **Create `tools/<name>.py`** - MCP tool wrapper with `register_<name>_tools(mcp)` function
+3. **Register in `server.py`** - import and call `register_<name>_tools(mcp)`
+4. **Add to README** - update the tools table
 
 ### Tool wrapper pattern
 
@@ -69,8 +69,8 @@ def register_example_tools(mcp: FastMCP) -> None:
 ## Development setup
 
 ```bash
-git clone https://github.com/LeoMbm/malt-mcp-server.git
-cd malt-mcp-server
+git clone https://github.com/LeoMbm/malt-mcp.git
+cd malt-mcp
 uv sync --group dev
 pre-commit install
 ```
@@ -98,6 +98,6 @@ uv run pytest --cov -v
 
 ## Navigation
 
-Malt is an SPA that never stops fetching. Always use `wait_until="commit"` — `networkidle` will hang.
+Malt is an SPA that never stops fetching. Always use `wait_until="commit"` - `networkidle` will hang.
 
 For lazy-loaded lists, scroll the container to trigger loading before scraping. See `scraping/missions.py` for the pattern.

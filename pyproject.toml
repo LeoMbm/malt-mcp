@@ -38,11 +38,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/LeoMbm/malt-mcp-server"
-Documentation = "https://github.com/LeoMbm/malt-mcp-server#readme"
-Repository = "https://github.com/LeoMbm/malt-mcp-server"
-Issues = "https://github.com/LeoMbm/malt-mcp-server/issues"
-Changelog = "https://github.com/LeoMbm/malt-mcp-server/releases"
+Homepage = "https://github.com/LeoMbm/malt-mcp"
+Documentation = "https://github.com/LeoMbm/malt-mcp#readme"
+Repository = "https://github.com/LeoMbm/malt-mcp"
+Issues = "https://github.com/LeoMbm/malt-mcp/issues"
+Changelog = "https://github.com/LeoMbm/malt-mcp/releases"
 
 [project.scripts]
 malt-mcp = "malt_mcp_server.cli:main"

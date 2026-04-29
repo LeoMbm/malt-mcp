@@ -9,19 +9,10 @@ from mcp.types import ToolAnnotations
 
 from malt_mcp_server.constants import MALT_PROFILE_URL, TOOL_TIMEOUT_SECONDS
 from malt_mcp_server.core.auth import require_auth
-from malt_mcp_server.core.browser import BrowserManager
-from malt_mcp_server.core.exceptions import (
-    MaltAuthError,
-    MaltNetworkError,
-    MaltScrapingError,
-)
+from malt_mcp_server.core.exceptions import MaltAuthError, MaltScrapingError
 from malt_mcp_server.scraping.profile import scrape_profile
 
 _USERNAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,98}[a-z0-9]$")
-
-
-def _get_browser(ctx: Context) -> BrowserManager:
-    return ctx.lifespan_context["browser"]
 
 
 def register_profile_tools(mcp: FastMCP) -> None:
@@ -42,10 +33,8 @@ def register_profile_tools(mcp: FastMCP) -> None:
         if not _USERNAME_RE.match(username):
             raise ToolError("Invalid username format.")
 
-        browser = _get_browser(ctx)
-
         try:
-            await require_auth(browser.page)
+            page = await require_auth()
         except MaltAuthError as e:
             raise ToolError(str(e)) from e
 
@@ -53,12 +42,12 @@ def register_profile_tools(mcp: FastMCP) -> None:
         await ctx.info(f"Fetching profile: {url}")
 
         try:
-            await browser.navigate(url)
-        except MaltNetworkError as e:
+            await page.goto(url, wait_until="commit")
+        except Exception as e:
             raise ToolError(f"Could not load profile: {e}") from e
 
         try:
-            profile = await scrape_profile(browser.page)
+            profile = await scrape_profile(page)
         except MaltScrapingError as e:
             raise ToolError(f"Failed to parse profile: {e}") from e
 
