@@ -107,14 +107,14 @@ class BrowserManager:
     def page(self) -> Page:
         if self._page is None:
             msg = "Browser not started. Call start() first."
-            raise MaltNetworkError(msg)
+            raise RuntimeError(msg)
         return self._page
 
     @property
     def context(self) -> BrowserContext:
         if self._context is None:
             msg = "Browser not started. Call start() first."
-            raise MaltNetworkError(msg)
+            raise RuntimeError(msg)
         return self._context
 
     async def navigate(self, url: str) -> Page:

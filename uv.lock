@@ -726,7 +726,6 @@ source = { editable = "." }
 dependencies = [
     { name = "fastmcp" },
     { name = "patchright" },
-    { name = "python-dotenv" },
 ]
 
 [package.dev-dependencies]
@@ -744,7 +743,6 @@ dev = [
 requires-dist = [
     { name = "fastmcp", specifier = ">=3.0.0" },
     { name = "patchright", specifier = ">=1.40.0" },
-    { name = "python-dotenv", specifier = ">=1.1.1" },
 ]
 
 [package.metadata.requires-dev]
