@@ -11,7 +11,7 @@ MALT_LOGIN_URL = f"{MALT_BASE_URL}/login"
 MALT_DASHBOARD_URL = f"{MALT_BASE_URL}/dashboard/freelancer"
 MALT_ANALYTICS_URL = f"{MALT_DASHBOARD_URL}/analytics"
 MALT_PROFILE_URL = f"{MALT_BASE_URL}/profile"
-MALT_MESSAGES_URL = f"{MALT_BASE_URL}/project/messages"
+MALT_MESSAGES_URL = f"{MALT_BASE_URL}/messages"
 
 # Browser defaults
 DEFAULT_TIMEOUT_MS = 30_000
