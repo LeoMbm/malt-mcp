@@ -7,6 +7,7 @@ from patchright.async_api import Error as PlaywrightError
 from patchright.async_api import Locator, Page
 
 from malt_mcp_server.core.exceptions import MaltScrapingError
+from malt_mcp_server.scraping._helpers import el_text, safe_count
 
 logger = logging.getLogger(__name__)
 
@@ -25,10 +26,8 @@ _SEL_OFFER_STATUS = ".client-project-offer-summary__activity_status"
 _SEL_LIST = "#messengerConversationList"
 
 
-async def scrape_missions(page: Page) -> list[dict[str, Any]]:
-    """Extract the conversation/mission list from the Malt messages page."""
-    logger.info("Scraping messages: %s", page.url)
-
+async def wait_for_conversation_list(page: Page) -> None:
+    """Wait for Cloudflare, then scroll the conversation list to load all items."""
     try:
         await page.wait_for_function(
             "() => !document.title.includes('instant')",
@@ -41,7 +40,6 @@ async def scrape_missions(page: Page) -> list[dict[str, Any]]:
             f"Messages page did not render. URL: {page.url} | Title: {title}"
         ) from e
 
-    # Scroll the conversation list to load all lazy-loaded items.
     scrollable = (
         page.locator(_SEL_LIST)
         .locator("xpath=ancestor::*[contains(@class,'scrollable')]")
@@ -50,9 +48,17 @@ async def scrape_missions(page: Page) -> list[dict[str, Any]]:
     all_items_sel = f"{_SEL_CONVERSATION}, {_SEL_PROJECT_OFFER}"
     await _scroll_to_load_all(scrollable, all_items_sel, page)
 
+
+async def scrape_missions(page: Page) -> list[dict[str, Any]]:
+    """Extract the conversation/mission list from the Malt messages page."""
+    logger.info("Scraping messages: %s", page.url)
+
+    await wait_for_conversation_list(page)
+
     # Parse all items in DOM order to preserve Malt's chronological sort.
+    all_items_sel = f"{_SEL_CONVERSATION}, {_SEL_PROJECT_OFFER}"
     all_items = page.locator(all_items_sel)
-    count = await _safe_count(all_items)
+    count = await safe_count(all_items)
     missions: list[dict[str, Any]] = []
 
     for i in range(count):
@@ -73,11 +79,11 @@ async def scrape_missions(page: Page) -> list[dict[str, Any]]:
 
 async def _parse_conversation(el: Locator) -> dict[str, Any] | None:
     try:
-        name = await _el_text(el.locator(_SEL_CONV_NAME))
-        company = await _el_text(el.locator(_SEL_CONV_COMPANY))
-        date = await _el_text(el.locator(_SEL_CONV_DATE))
-        last_msg = await _el_text(el.locator(_SEL_CONV_LAST_MSG))
-        status = await _el_text(el.locator(_SEL_CONV_STATUS))
+        name = await el_text(el.locator(_SEL_CONV_NAME))
+        company = await el_text(el.locator(_SEL_CONV_COMPANY))
+        date = await el_text(el.locator(_SEL_CONV_DATE))
+        last_msg = await el_text(el.locator(_SEL_CONV_LAST_MSG))
+        status = await el_text(el.locator(_SEL_CONV_STATUS))
 
         if not name:
             return None
@@ -101,11 +107,11 @@ async def _parse_conversation(el: Locator) -> dict[str, Any] | None:
 
 async def _parse_offer(el: Locator) -> dict[str, Any] | None:
     try:
-        title = await _el_text(el.locator(_SEL_CONV_NAME))
-        company = await _el_text(el.locator(_SEL_CONV_COMPANY))
-        date = await _el_text(el.locator(_SEL_CONV_DATE))
-        last_msg = await _el_text(el.locator(_SEL_OFFER_LAST_MSG))
-        status = await _el_text(el.locator(_SEL_OFFER_STATUS))
+        title = await el_text(el.locator(_SEL_CONV_NAME))
+        company = await el_text(el.locator(_SEL_CONV_COMPANY))
+        date = await el_text(el.locator(_SEL_CONV_DATE))
+        last_msg = await el_text(el.locator(_SEL_OFFER_LAST_MSG))
+        status = await el_text(el.locator(_SEL_OFFER_STATUS))
 
         result: dict[str, Any] = {
             "type": "project_offer",
@@ -125,22 +131,6 @@ async def _parse_offer(el: Locator) -> dict[str, Any] | None:
         return None
 
 
-async def _el_text(locator: Locator) -> str | None:
-    try:
-        if await locator.count() > 0:
-            text = await locator.first.inner_text()
-            return text.strip() if text else None
-    except PlaywrightError:
-        return None
-    return None
-
-
-async def _safe_count(locator: Locator) -> int:
-    try:
-        return await locator.count()
-    except PlaywrightError:
-        return 0
-
 
 _MAX_SCROLLS = 20
 
@@ -153,7 +143,7 @@ async def _scroll_to_load_all(
     """Scroll the conversation list container to load all items."""
     prev_count = 0
     for _ in range(_MAX_SCROLLS):
-        current_count = await _safe_count(page.locator(items_selector))
+        current_count = await safe_count(page.locator(items_selector))
         if current_count == prev_count and prev_count > 0:
             break
         prev_count = current_count
