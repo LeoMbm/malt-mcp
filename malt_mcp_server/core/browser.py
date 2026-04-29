@@ -25,6 +25,7 @@ from malt_mcp_server.constants import (
     DEFAULT_USER_DATA_DIR,
     PRIVATE_DIR_MODE,
 )
+from malt_mcp_server.bootstrap import configure_browser_environment
 from malt_mcp_server.core.exceptions import MaltNetworkError
 
 logger = logging.getLogger(__name__)
@@ -122,6 +123,7 @@ class BrowserManager:
             return False
 
     async def start(self) -> None:
+        configure_browser_environment()
         _secure_mkdir(BROWSER_DIR)
         _secure_mkdir(Path(self.user_data_dir))
         _harden_directory(Path(self.user_data_dir))
@@ -130,7 +132,6 @@ class BrowserManager:
 
         self._context = await self._playwright.chromium.launch_persistent_context(
             user_data_dir=self.user_data_dir,
-            channel="chrome",
             headless=self.headless,
             no_viewport=True,
             **self.launch_options,

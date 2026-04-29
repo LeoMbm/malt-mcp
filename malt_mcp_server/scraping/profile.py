@@ -36,6 +36,17 @@ _SEL_LANGUAGES_NAME = "[data-testid^='profile-language-name-']"
 _SEL_LANGUAGES_LEVEL = "[data-testid^='profile-language-level-']"
 
 
+_OWN_PROFILE_RE = re.compile(r"/profile/([a-z0-9](?:[a-z0-9-]*[a-z0-9])?)")
+
+
+async def extract_own_username(page: Page) -> str:
+    """Extract the logged-in user's username from the current page URL."""
+    match = _OWN_PROFILE_RE.search(page.url)
+    if match:
+        return match.group(1)
+    raise MaltScrapingError(f"Could not detect username from URL: {page.url}")
+
+
 async def scrape_profile(page: Page) -> dict[str, Any]:
     """Extract profile data from the current Malt profile page."""
     logger.info("Scraping URL: %s", page.url)

@@ -20,7 +20,7 @@ MCP server for [Malt.fr](https://www.malt.fr). Lets Claude (or any MCP client) r
 | Tool | Description | Status |
 |------|-------------|--------|
 | `authenticate` | Log in to Malt interactively from Claude Desktop | working |
-| `get_profile` | Get freelance profile info (bio, daily rate, skills, rating) | working |
+| `get_profile` | Get freelance profile info (bio, daily rate, skills, rating). Omit username to fetch your own profile. | working |
 | `get_statistics` | View profile stats (views, response rate, missions) | working |
 | `get_missions` | List mission conversations from messaging | working |
 | `get_mission_details` | Get full details of a specific mission (budget, skills, messages) | working |
@@ -96,6 +96,7 @@ uvx malt-mcp@latest --login
 
 - Headless mode doesn't work - Cloudflare blocks it. The browser window is expected.
 - First run downloads Chromium (~200 MB via Patchright). One-time thing.
+- **Upgrading from v0.3.x?** Run `uvx malt-mcp@latest --logout` then `--login`. The browser engine changed from system Chrome to managed Chromium.
 
 ## 🔒 How it works
 

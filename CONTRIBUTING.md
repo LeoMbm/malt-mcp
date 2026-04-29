@@ -36,6 +36,7 @@ malt_mcp_server/
 - **`constants.py` holds all URLs.** Never hardcode Malt URLs elsewhere.
 - **One browser tab at a time.** Tool calls are serialized, never concurrent.
 - **Headed mode only.** Cloudflare blocks headless browsers. Don't try to work around it.
+- **Managed Chromium only.** Patchright installs its own Chromium in `~/.malt-mcp/patchright-browsers/`. Never use `channel="chrome"` (conflicts with running Chrome) or system browser paths.
 
 ## Adding a new tool
 

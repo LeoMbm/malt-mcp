@@ -10,7 +10,8 @@ MCP server that lets AI assistants manage a Malt.fr freelance account via browse
 # Stack
 - Patchright (not Playwright) — anti-detection fork, required for Malt/Cloudflare
 - FastMCP v3 with lifespan for browser lifecycle management
-- `uv run patchright install chrome` required before first use (bootstrap.py auto-runs this)
+- `uv run patchright install chromium` required before first use (bootstrap.py auto-runs this)
+- Managed Chromium stored in `~/.malt-mcp/patchright-browsers/` — never uses system Chrome
 
 # Commands
 - `uv run malt-mcp --login` — manual browser login (Google OAuth broken, use email/password only)
@@ -40,6 +41,7 @@ See `.claude/rules/dev-workflow.md` for the full mandatory workflow. Summary:
 5. **Final /deslop pass** — catch any remaining slop before commit
 
 # Do NOT
+- Do not use `channel="chrome"` or system Chrome — use Patchright's managed Chromium to avoid conflicts with running Chrome
 - Do not use `headless=True` — Cloudflare will block every request
 - Do not use `networkidle` wait strategy — Malt SPA never settles, use `commit`
 - Do not put CSS selectors in `tools/` — all DOM access belongs in `scraping/`
